@@ -1,19 +1,12 @@
-<div class="max-w-md mx-auto bg-white rounded-md overflow-hidden shadow-md m-4 p-4">
-    <!-- nome -->
-    @if(changesMade){
-    <input [(ngModel)]="tasks[0].titulo" class="w-full mb-2 px-2 py-1 border rounded">
-    }
-    <!-- descrição -->
-    <textarea [(ngModel)]="tasks[0].descricao" class="w-full mb-4 px-2 py-1 border rounded"></textarea>
-    <div class="flex">
-        <label class="flex items-center">
-            <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600">
-            <span class="ml-2">Concluído</span>
-        </label>
-        <!-- botão Salvar condicional -->
-        @if(changesMade){
-        <button (click)="saveChanges()"
-            class="bg-blue-500 text-white px-4 py-2 rounded-full ml-auto">Salvar</button>
-        }
-    </div>
+
+@if(tasksLoaded){
+@for (task of tasks; track task) {
+<div class=" flex space-x-0.5  mx-auto mb-2 w-full rounded-md overflow-hidden p-4">
+    <input type="checkbox" class=" form-checkbox h-10 w-10 mt-2 text-indigo-600">
+    <textarea [(ngModel)]="task.description" maxlength="27" class="w-128 bg-stone-100 mt-3  h-8 border-b-2 border-gray-400 outline-none p-1 overflow-hidden resize-none handwritten-text text-2xl"></textarea>
 </div>
+@if(changesMade){
+<button (click)="saveChanges()" class="bg-blue-500 text-white px-4 py-2 rounded-full ml-auto">Salvar</button>
+}
+}
+}

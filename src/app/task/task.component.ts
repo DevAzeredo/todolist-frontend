@@ -1,38 +1,76 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit  } from '@angular/core';
 import { Task } from '../../shared/interfaces/task.interface';
-import { TaskService } from './task.service';
-
+import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-task',
-  standalone: false,
+  standalone: true,
+  imports: [FormsModule],
   templateUrl: './task.component.html',
   styleUrl: './task.component.css'
 })
+export class TaskComponent implements OnInit{
+  changesMade: boolean = false;
+tasks: Task[]=[];
 
-export class TaskComponent implements OnInit {
-  
-    constructor(private taskService: TaskService) {}
-
-    private loadTasks() {
-      this.taskService.getTasks().subscribe({
-        next: (tasks) => {
-          this.tasks = tasks;
-          // Aqui você pode realizar outras ações após obter as tarefas, se necessário.
-        },
-        error: (error) => {
-          console.error('Erro ao obter tarefas:', error);
-        }
-      });
-    }
-
+tasksLoaded :boolean = false;
+constructor(private http: HttpClient) {}
   ngOnInit() {
-    this.loadTasks();
+    this.getTasksFromBackend();
   }
-  tasks: Task[] = [];
-  changesMade = true;
+  getTasksFromBackend() {
 
-  saveChanges() {
-    this.changesMade = false;
+
+    this.tasks =[ {
+      "id": "65872e95a1b2e2026ea3d436",
+      "title": "ALTEREI O NOME DESSA task",
+      "description": "teste descricao 1",
+      "completed": false
+  }, {
+    "id": "65872e95a1b2e2026ea3d436",
+    "title": "ALTEREI O NOME DESSA task",
+    "description": "teste descricao 1",
+    "completed": false
+}, {
+  "id": "65872e95a1b2e2026ea3d436",
+  "title": "ALTEREI O NOME DESSA task",
+  "description": "teste descricao 1",
+  "completed": false
+}, {
+  "id": "65872e95a1b2e2026ea3d436",
+  "title": "ALTEREI O NOME DESSA task",
+  "description": "teste descricao 1",
+  "completed": false
+}, {
+  "id": "65872e95a1b2e2026ea3d436",
+  "title": "ALTEREI O NOME DESSA task",
+  "description": "teste descricao 1",
+  "completed": false
+}, {
+  "id": "65872e95a1b2e2026ea3d436",
+  "title": "ALTEREI O NOME DESSA task",
+  "description": "teste descricao 1",
+  "completed": false
+}, {
+  "id": "65872e95a1b2e2026ea3d436",
+  "title": "ALTEREI O NOME DESSA task",
+  "description": "teste descricao 1",
+  "completed": false
+},];
+    /*this.http.get<Task[]>('http://localhost:3000/tasks').subscribe({
+      next: (tasks) => {
+        this.tasks = tasks;
+        console.log(tasks);
+        
+      },
+      error: (error) => {
+        console.error('Erro ao obter tarefas do backend:', error);
+      },
+    });*/
+    this.tasksLoaded = true;
   }
+saveChanges() {
+throw new Error('Method not implemented.');
+}
 }
