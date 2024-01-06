@@ -1,12 +1,21 @@
-
-@if(tasksLoaded){
 @for (task of tasks; track task) {
+@if(!task.confirmDelete){
 <div class=" flex space-x-0.5  mx-auto mb-2 w-full rounded-md overflow-hidden p-4">
     <input type="checkbox" class=" form-checkbox h-10 w-10 mt-2 text-indigo-600">
-    <textarea [(ngModel)]="task.description" maxlength="27" class="w-128 bg-stone-100 mt-3  h-8 border-b-2 border-gray-400 outline-none p-1 overflow-hidden resize-none handwritten-text text-2xl"></textarea>
+    <textarea [(ngModel)]="task.description" maxlength="27"
+        class="w-128 bg-stone-100 mt-3  h-8 border-b-2 border-gray-400 outline-none p-1 overflow-hidden resize-none handwritten-text text-2xl"></textarea>
+    <button (click)="toggleDeleteConfirmation(task)" class="ml-auto text-red-500">{{ task.intentionDelete ? '!' : 'X'
+        }}</button>
 </div>
-@if(changesMade){
-<button (click)="saveChanges()" class="bg-blue-500 text-white px-4 py-2 rounded-full ml-auto">Salvar</button>
+}}
+@for (newTask of newTasks; track newTask) {
+<div class=" flex space-x-0.5  mx-auto mb-2 w-full rounded-md overflow-hidden p-4">
+    <input type="checkbox" class=" form-checkbox h-10 w-10 mt-2 text-indigo-600">
+    <textarea [(ngModel)]="newTask.description" maxlength="27"
+        class="w-128 bg-stone-100 mt-3  h-8 border-b-2 border-gray-400 outline-none p-1 overflow-hidden resize-none handwritten-text text-2xl"></textarea>
+</div>
 }
-}
-}
+<div class="flex">
+    <button (click)="createNewTask()" class="bg-blue-500 text-white px-4 py-2 rounded-full">Criar task</button>
+    <button (click)="saveChanges()" class="bg-blue-500 text-white px-4 py-2 rounded-full ml-auto">Salvar</button>
+</div>
