@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Task } from '../../shared/interfaces/task.interface';
 import { FormsModule } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { Observable, catchError, forkJoin } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-task',
@@ -16,12 +16,9 @@ export class TaskComponent implements OnInit {
   changesMade: boolean = false;
   tasks: Task[] = [];
   newTasks: Task[] = [];
+  deletedTask: Task[] = [];
   tasksLoaded: boolean = false;
-  constructor( private http: HttpClient) {
-  }
-
-  createTasks(tasks: Task[]): Observable<Task[]> {
-    return this.http.post<Task[]>(`${this.apiUrl}`, tasks);
+  constructor(private http: HttpClient) {
   }
 
   getTasks(): Observable<Task[]> {
@@ -40,35 +37,42 @@ export class TaskComponent implements OnInit {
       }
     );
   }
-
+  saveNewTasks(task: Task[]) {
+    return this.http.post<Task[]>(`${this.apiUrl}`, task);
+  }
+  saveDeletedTasks(tasks: Task[]) {
+    const deleteRequests = tasks.map((t) => this.http.delete<void>(`${this.apiUrl}/${t.id}`));
+    return forkJoin(deleteRequests);
+  }
   saveChanges() {
+    this.saveNewTasks(this.newTasks).subscribe({
+      next: (tasks: Task[]) => tasks,
+      error: (error: any) => console.error('Erro ao salvar tarefas:', error),
+    });
+    this.saveDeletedTasks(this.deletedTask).subscribe();
 
   }
   createNewTask() {
     const newTask: Task = {
       description: "",
       completed: false,
-      id: "",
-      title: "",
-      confirmDelete: false,
+      id: '',
     };
     this.newTasks.push(newTask);
   }
-  deleteTask(task: Task) {
-    const index = this.newTasks.indexOf(task);
-    if (index !== -1) {
-      this.newTasks.splice(index, 1);
-    }
-  }
-  toggleDeleteConfirmation(task: Task) {
-    if (task.intentionDelete) {
-      task.confirmDelete = !task.confirmDelete;
-    }
-    if (task.confirmDelete) {
-      console.log('1');
-      this.deleteTask(task);
-    }
-    task.intentionDelete = !task.intentionDelete;
+
+  isTaskDeleted(task: Task) {
+    var index = this.deletedTask.indexOf(task);
+    return index > -1;
   }
 
+  toggleDeleteConfirmation(task: Task) {
+    var index = this.deletedTask.indexOf(task);
+    if (index !== -1) {
+      this.deletedTask.splice(index, 1);
+    }
+    else {
+      this.deletedTask.push(task);
+    }
+  }
 }
