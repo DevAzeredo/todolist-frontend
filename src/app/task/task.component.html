@@ -1,7 +1,7 @@
 @for (task of tasks; track task) {
 
 <div class=" flex space-x-0.5  mx-auto mb-2 w-full rounded-md overflow-hidden p-4">
-    <input type="checkbox" class=" form-checkbox h-10 w-10 mt-2 text-indigo-600">
+    <input type="checkbox" [(ngModel)]="task.completed" class=" form-checkbox h-10 w-10 mt-2 text-indigo-600">
     <textarea [(ngModel)]="task.description" maxlength="27"
         class="w-128 bg-stone-100 mt-3  h-8 border-b-2 border-gray-400 outline-none p-1 overflow-hidden resize-none handwritten-text text-2xl"></textarea>
     <button (click)="toggleDeleteConfirmation(task)" class="ml-auto text-red-500">{{ isTaskDeleted(task) ? '!' : 'X'

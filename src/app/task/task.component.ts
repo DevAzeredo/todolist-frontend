@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Task } from '../../shared/interfaces/task.interface';
 import { FormsModule } from '@angular/forms';
-import { Observable, catchError, forkJoin } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, forkJoin } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { TaskService } from './task.service';
+
 
 @Component({
   selector: 'app-task',
@@ -15,43 +18,46 @@ export class TaskComponent implements OnInit {
   private apiUrl = 'http://localhost:3000/tasks';
   changesMade: boolean = false;
   tasks: Task[] = [];
+  originalTasks: Task[] = [];
   newTasks: Task[] = [];
   deletedTask: Task[] = [];
   tasksLoaded: boolean = false;
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private taskService: TaskService) {
   }
 
-  getTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(`${this.apiUrl}`);
-  }
 
   ngOnInit() {
     this.getTasksFromBackend();
   }
 
   getTasksFromBackend() {
-    this.getTasks().subscribe(
+    this.taskService.getTasks().subscribe(
       {
-        next: (tasks: Task[]) => this.tasks = tasks,
+        next: (tasks: Task[]) => {
+          this.tasks = tasks
+          this.originalTasks = [...tasks];
+        },
         error: (error: any) => console.error('Erro ao carregar tarefas:', error),
       }
     );
   }
-  saveNewTasks(task: Task[]) {
-    return this.http.post<Task[]>(`${this.apiUrl}`, task);
-  }
-  saveDeletedTasks(tasks: Task[]) {
-    const deleteRequests = tasks.map((t) => this.http.delete<void>(`${this.apiUrl}/${t.id}`));
-    return forkJoin(deleteRequests);
-  }
+
   saveChanges() {
-    this.saveNewTasks(this.newTasks).subscribe({
-      next: (tasks: Task[]) => tasks,
+    this.taskService.saveNewTasks(this.newTasks).subscribe({
+      next: (newTasks: Task[]) => {
+        this.tasks.push(...newTasks);
+      },
       error: (error: any) => console.error('Erro ao salvar tarefas:', error),
     });
-    this.saveDeletedTasks(this.deletedTask).subscribe();
+    this.newTasks = [];
 
+    this.taskService.saveDeletedTasks(this.deletedTask).subscribe();
+    this.deletedTask.forEach(deleted => {
+      this.tasks = this.tasks.filter(task => task.id !== deleted.id);
+    });
+    this.taskService.saveModifiedTasks(this.tasks, this.originalTasks).subscribe();
   }
+
   createNewTask() {
     const newTask: Task = {
       description: "",
